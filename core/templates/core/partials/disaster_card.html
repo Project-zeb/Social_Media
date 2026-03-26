@@ -1,0 +1,77 @@
+<div class="col-md-6 mb-4" id="event-{{ alert.id }}">
+    <div class="card p-3 shadow-sm h-100 border-0 {% if alert.intel_tier == 3 %}border-start border-success border-4{% endif %}" 
+         style="background-color: #1e293b; border: 1px solid #334155;">
+        
+        <div class="d-flex justify-content-between align-items-start">
+            <div>
+                <h4 class="text-uppercase text-info mb-0">{{ alert.event_type }}</h4>
+                <small class="text-muted d-block mt-1">
+                    {% if alert.intel_tier == 3 %}
+                        <span class="text-success fw-bold"><i class="fas fa-user-shield me-1"></i> OFFICIAL AUTHENTICATED</span>
+                    {% elif alert.intel_tier == 2 %}
+                        <span class="text-primary fw-bold"><i class="fas fa-robot me-1"></i> AI VALIDATED (TIER 2)</span>
+                    {% else %}
+                        <span class="text-warning fw-bold"><i class="fas fa-satellite-dish me-1"></i> RAW INTEL (PENDING)</span>
+                    {% endif %}
+                </small>
+            </div>
+            
+            <div class="text-end">
+                <span class="badge {% if alert.intel_tier == 3 %}bg-success{% elif alert.display_score > 80 %}bg-danger{% else %}bg-warning text-dark{% endif %} py-2 px-3 shadow-sm">
+                    {% if alert.intel_tier == 3 %}
+                        🛡️ 100% VERIFIED
+                    {% else %}
+                        MATCH: {{ alert.display_score }}%
+                    {% endif %}
+                </span>
+            </div>
+        </div>
+        
+        <div class="d-flex align-items-center mt-3">
+            <div class="flex-grow-1">
+                <p class="mb-1 fs-5">📍 <strong>{{ alert.district }}</strong></p>
+                <p class="text-secondary small mb-0">Grid Sector: {{ alert.grid_lat }}°N, {{ alert.grid_lon }}°E</p>
+            </div>
+        </div>
+
+        <hr class="border-secondary my-3">
+        
+        <div class="bg-dark bg-opacity-50 p-2 rounded mb-3 border border-secondary border-opacity-25">
+            <small class="text-info d-block mb-1 fw-bold" style="font-size: 0.7rem; letter-spacing: 0.5px;">SITUATIONAL BRIEFING</small>
+            <p class="small text-light mb-0 summary-text" style="line-height: 1.4;">
+                {{ alert.summary|default:"Processing multimodal vector data..." }}
+            </p>
+        </div>
+        
+        <div class="mt-auto">
+            <a href="{% url 'event_detail' alert.id %}" class="btn btn-sm btn-outline-info w-100 py-2 mb-2 fw-bold">
+                <i class="fas fa-magnifying-glass-chart me-1"></i> VIEW FULL ANALYSIS
+            </a>
+
+            {% if user.is_authenticated %}
+            <div class="admin-actions mt-2 p-2 rounded border border-secondary bg-black bg-opacity-25 shadow-inner">
+                <small class="text-muted d-block mb-2 text-center" style="font-size: 0.6rem; letter-spacing: 1.5px; font-weight: 800;">COMMAND CONSOLE</small>
+                <div class="btn-group w-100">
+                    {% if alert.status != 'VERIFIED' %}
+                    <a href="{% url 'update_status' alert.id 'VERIFIED' %}" class="btn btn-sm btn-success fw-bold" title="Approve as Official">
+                        <i class="fas fa-check-shield me-1"></i> VERIFY
+                    </a>
+                    {% endif %}
+                    
+                    {% if alert.status != 'FAKE' %}
+                    <a href="{% url 'update_status' alert.id 'FAKE' %}" class="btn btn-sm btn-danger" title="Mark as Fake">
+                        <i class="fas fa-trash-can"></i> FAKE
+                    </a>
+                    {% endif %}
+
+                    {% if alert.status == 'VERIFIED' %}
+                    <a href="{% url 'update_status' alert.id 'PENDING' %}" class="btn btn-sm btn-secondary fw-bold" title="Reset to Pending">
+                        <i class="fas fa-rotate-left me-1"></i> UNDO
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>

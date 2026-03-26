@@ -1,0 +1,28 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Live Feed{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h1 class="mb-0">Live Intel Feed</h1>
+        <p class="text-info small mb-0 fw-bold">REAL-TIME DISASTER INTELLIGENCE ENGINE</p>
+    </div>
+</div>
+
+<div class="row" id="disaster-container">
+    {% for alert in alerts %}
+        {% include 'core/partials/disaster_card.html' with alert=alert %}
+    {% endfor %}
+</div>
+{% endblock %}
+
+{% block websocket_logic %}
+    // Logic to prepend or update cards (from your original file)
+    let card = document.getElementById(`event-${data.id}`);
+    if (card) {
+        card.querySelector('.score-badge').innerText = `CONFIDENCE: ${data.truth_score}%`;
+    } else {
+        // ... (Logic to insert new card)
+    }
+{% endblock %}
